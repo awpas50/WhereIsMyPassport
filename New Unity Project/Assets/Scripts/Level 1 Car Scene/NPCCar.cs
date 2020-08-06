@@ -5,24 +5,36 @@ using UnityEngine;
 public class NPCCar : MonoBehaviour
 {
     public float speed;
-    private float initialSpeed;
+    public float initialSpeed;
+
+    [HideInInspector] public GameObject player;
+    public GameObject playerRef;
+    public NPCCar otherCar;
 
     public void Start()
     {
+        player = GameObject.FindGameObjectWithTag("Player");
+        playerRef = player.GetComponent<PlayerCar>().playerRef;
         initialSpeed = speed;
+
+        Physics2D.queriesStartInColliders = false;
+        Debug.DrawRay(transform.position, Vector3.right * 3.5f, Color.red);
     }
     public virtual void Update()
     {
         //movement
         transform.position += Vector3.right * Time.deltaTime * speed;
-        if(Input.GetKeyDown(KeyCode.A))
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector3.right, 3.5f);
+
+        if (hit.collider != null && (hit.collider.gameObject.tag == "Car" || hit.collider.gameObject.tag == "Ambulance" || hit.collider.gameObject.tag == "PoliceCar"))
         {
-            speed = initialSpeed * 1.2f;
+            Debug.DrawRay(transform.position, Vector3.right * 3.5f, Color.green);
+            otherCar = hit.collider.gameObject.GetComponent<NPCCar>();
+            otherCar.speed = speed;
         }
-        if (Input.GetKeyUp(KeyCode.A))
-        {
-            speed = initialSpeed;
-        }
+
+        // player.GetComponent<PlayerCar>().screenPos.x (0 ~~ 1)
+        speed = initialSpeed * (2 - player.GetComponent<PlayerCar>().screenPos.x);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -30,13 +42,6 @@ public class NPCCar : MonoBehaviour
         if (other.gameObject.tag == "Boundary")
         {
             Destroy(gameObject);
-        }
-
-        if (other.gameObject.tag == "Car")
-        {
-            Debug.Log(other.gameObject);
-            NPCCar otherCar = other.gameObject.GetComponent<NPCCar>();
-            speed = otherCar.speed;
         }
     }
 }

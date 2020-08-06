@@ -6,6 +6,10 @@ TagManager:
   tags:
   - Boundary
   - Car
+  - EndPoint
+  - Ambulance
+  - PoliceCar
+  - LevelLoader
   layers:
   - Default
   - TransparentFX
@@ -16,7 +20,7 @@ TagManager:
   - 
   - 
   - Wall
-  - 
+  - Car
   - 
   - 
   - 
